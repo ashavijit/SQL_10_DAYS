@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update STG</title>
+    <style>
+        #update-form {
+            width: 50%;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        #add-update,
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #add-update {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        button[type="submit"] {
+            background-color: #008CBA;
+            color: white;
+        }
+
+        #message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <form id="update-form">
+        <label for="filename">Enter the file name:</label>
+        <input type="text" id="filename" name="filename" required>
+        <div id="updates">
+            <div class="update">
+                <label for="key">Enter the key to update:</label>
+                <input type="text" class="key" name="key" required>
+                <label for="value">Enter the value to update:</label>
+                <input type="text" class="value" name="value" required>
+            </div>
+        </div>
+        <button type="button" id="add-update">Add another update</button>
+        <button type="submit">Update</button>
+    </form>
+    <div id="message"></div>
+
+    <script>
+        document.getElementById('add-update').addEventListener('click', function() {
+            const updatesDiv = document.getElementById('updates');
+            const newUpdateDiv = document.createElement('div');
+            newUpdateDiv.className = 'update';
+            let i = updatesDiv.children.length + 1;
+            newUpdateDiv.innerHTML = `
+                <label for="key">Enter the key-${i} to update:</label>
+                <input type="text" class="key" name="key" required>
+                <label for="value">Enter the value-${i} to update:</label>
+                <input type="text" class="value" name="value" required>
+            `;
+            i++;
+            updatesDiv.appendChild(newUpdateDiv);
+        });
+
+        document.getElementById('update-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const filename = document.getElementById('filename').value;
+            const keys = Array.from(document.getElementsByClassName('key')).map(input => input.value);
+            const values = Array.from(document.getElementsByClassName('value')).map(input => input.value);
+
+            const updates = keys.map((key, index) => ({ key, value: values[index] }));
+
+            fetch('http://localhost:3000/update-json', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ filename, updates }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('message').textContent = data.message;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
