@@ -96,7 +96,7 @@
 
             const updates = keys.map((key, index) => ({ key, value: values[index] }));
 
-            fetch('http://localhost:3000/update-json', {
+            fetch('https://stgupdatebackend.onrender.com/update-json', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
